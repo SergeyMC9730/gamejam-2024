@@ -359,7 +359,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\raylib_game.c ..\..\..\src\tilemap.c ..\..\..\src\intvec.c ..\..\..\src\ftext.c ..\..\..\src\fstate.c"  />
+    <ClCompile Include="..\..\..\src\raylib_game.c;..\..\..\src\tilemap.c;..\..\..\src\intvec.c;..\..\..\src\ftext.c;..\..\..\src\fstate.c"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\src\raylib_game.rc" />
