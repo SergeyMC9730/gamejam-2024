@@ -21,6 +21,7 @@
 #include <stdio.h>                          // Required for: printf()
 #include <stdlib.h>                         // Required for: 
 #include <string.h>                         // Required for: 
+#include "fstate.h"
 
 //----------------------------------------------------------------------------------
 // Defines and Macros
@@ -72,14 +73,17 @@ int main(void)
 
     // Initialization
     //--------------------------------------------------------------------------------------
-    InitWindow(screenWidth, screenHeight, "raylib gamejam template");
+    InitWindow(screenWidth, screenHeight, "Connections");
     
     // TODO: Load resources / Initialize variables at this point
     
     // Render texture to draw full screen, enables screen scaling
     // NOTE: If screen is scaled, mouse input should be scaled proportionally
-    target = LoadRenderTexture(screenWidth, screenHeight);
-    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    __state.framebuffer = LoadRenderTexture(screenWidth / 5, screenHeight / 5);
+    SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);
+
+    struct ftilemap tilemap = _fTilemapCreate("resources/connections1.png", (IVector2){8, 8});
+    __state.tilemap = &tilemap;
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
@@ -109,6 +113,27 @@ int main(void)
 //--------------------------------------------------------------------------------------------
 // Module functions definition
 //--------------------------------------------------------------------------------------------
+
+void DrawFramebuffer(void)
+{
+    ClearBackground(BLACK);
+        
+    int w =__state.framebuffer.texture.width;
+    int h =__state.framebuffer.texture.height;
+    
+    switch (__state.intro_stage) {
+        case 0: {
+            int size_x = 6 * __state.tilemap->tile_size.x;
+            int size_y = 1 * __state.tilemap->tile_size.y;
+
+            int cx = (w - size_x) / 2;
+            int cy = (h - size_y) / 2;
+
+            _fTilemapDrawMegatile(*__state.tilemap, (IVector2){cx, cy}, (IVector2){0, 0}, (IVector2){6, 1}, 0, 0, WHITE);
+        }
+    }
+}
+
 // Update and draw frame
 void UpdateDrawFrame(void)
 {
@@ -121,13 +146,8 @@ void UpdateDrawFrame(void)
     //----------------------------------------------------------------------------------
     // Render game screen to a texture, 
     // it could be useful for scaling or further shader postprocessing
-    BeginTextureMode(target);
-        ClearBackground(RAYWHITE);
-        
-        // TODO: Draw your game screen here
-        DrawText("Welcome to raylib NEXT gamejam!", 150, 140, 30, BLACK);
-        DrawRectangleLinesEx((Rectangle){ 0, 0, screenWidth, screenHeight }, 16, BLACK);
-        
+    BeginTextureMode(__state.framebuffer);
+        DrawFramebuffer();
     EndTextureMode();
     
     // Render to screen (main framebuffer)
@@ -135,7 +155,7 @@ void UpdateDrawFrame(void)
         ClearBackground(RAYWHITE);
         
         // Draw render texture to screen, scaled if required
-        DrawTexturePro(target.texture, (Rectangle){ 0, 0, (float)target.texture.width, -(float)target.texture.height }, (Rectangle){ 0, 0, (float)target.texture.width, (float)target.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+        DrawTexturePro(__state.framebuffer.texture, (Rectangle){ 0, 0, (float)__state.framebuffer.texture.width, -(float)__state.framebuffer.texture.height }, (Rectangle){ 0, 0, (float)__state.framebuffer.texture.width * 5, (float)__state.framebuffer.texture.height * 5 }, (Vector2){ 0, 0 }, 0.0f, WHITE);
 
         // TODO: Draw everything that requires to be drawn at this point, maybe UI?
 

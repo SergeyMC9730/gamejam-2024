@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "ftext.h": "c",
+        "tilemap.h": "c"
+    }
+}
